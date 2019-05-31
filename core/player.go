@@ -180,3 +180,34 @@ func (p *Player) SyncSurrounding() {
 	//将周边全部玩家的protobuf消息作为msgID为202的数据发送给当前客户端
 	p.SendMsg(202, syncPlayersProtoMsg)
 }
+
+//UpdatePosition 位置更新广播（将当前的新坐标发送给周边全部玩家）的方法
+func (p *Player) UpdatePosition(x, y, z, v float32) {
+	//将新坐标更新到当前玩家
+	p.X = x
+	p.Y = y
+	p.Z = z
+	p.V = v
+
+	//定义玩家ID和位置的proto协议消息
+	protoMsg := &pb.BroadCast{
+		Pid: p.Pid,
+		Tp:  4, //更新坐标
+		Data: &pb.BroadCast_P{
+			P: &pb.Position{
+				X: p.X,
+				Y: p.Y,
+				Z: p.Z,
+				V: p.V,
+			},
+		},
+	}
+
+	//获取当前玩家周边九宫格范围内的全部玩家
+	players := p.GetSurroundingPlayers()
+
+	//将玩家ID和位置的proto协议消息作为msgID为200的数据发送给每个玩家的客户端
+	for _, player := range players {
+		player.SendMsg(200, protoMsg)
+	}
+}

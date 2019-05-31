@@ -41,8 +41,10 @@ func main() {
 	//注册hook函数
 	s.AddOnConnStart(OnConnectionAdd)
 
-	//注册msgID为2的业务路由
+	//定义msgID为2的业务路由（世界聊天）
 	s.AddRouter(2, &apis.WorldChat{})
+	//定义msgID为3的业务路由（坐标更新）
+	s.AddRouter(3, &apis.Move{})
 
 	//启动服务
 	s.Serve()
