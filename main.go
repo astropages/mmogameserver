@@ -27,6 +27,9 @@ func OnConnectionAdd(conn tsinterface.IConnection) {
 	//给连接添加一个键为pid的属性
 	conn.SetProperty("pid", p.Pid)
 
+	//同步周边玩家，广播当前玩家的位置信息
+	p.SyncSurrounding()
+
 	fmt.Printf("玩家%d上线，当前共%d个玩家\n", p.Pid, len(core.WorldMgrObj.Players))
 
 }

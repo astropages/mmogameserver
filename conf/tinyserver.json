@@ -6,5 +6,5 @@
 	"MaxPackageSize": 512,
 	"WorkerPoolSize": 10,
 	"MaxWorkerTaskLen": 1000,
-	"MaxConn": 2
+	"MaxConn": 5
 }

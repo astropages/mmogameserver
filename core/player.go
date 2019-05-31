@@ -119,3 +119,64 @@ func (p *Player) SendTalkMsgToAll(content string) {
 		player.SendMsg(200, protoMsg)
 	}
 }
+
+//GetSurroundingPlayers 获取当前玩家周边的全部玩家
+func (p *Player) GetSurroundingPlayers() []*Player {
+	pids := WorldMgrObj.AoiMgr.GetSurroundPIDsByPos(p.X, p.Z)
+	players := make([]*Player, 0, len(pids))
+	for _, pid := range pids {
+		players = append(players, WorldMgrObj.GetPlayerByPid(int32(pid)))
+	}
+	return players
+}
+
+//SyncSurrounding 将自己的消息同步给周围玩家
+func (p *Player) SyncSurrounding() {
+	//获取当前玩家周边九宫格范围内的全部玩家
+	players := p.GetSurroundingPlayers()
+
+	//定义一个当前玩家ID和位置的protobuf消息
+	protoMsg := &pb.BroadCast{
+		Pid: p.Pid,
+		Tp:  2,
+		Data: &pb.BroadCast_P{
+			P: &pb.Position{
+				X: p.X,
+				Y: p.Y,
+				Z: p.Z,
+				V: p.V,
+			},
+		},
+	}
+
+	//将玩家ID和位置的protobuf消息作为msgID为200的数据发送给周边玩家
+	for _, player := range players {
+		player.SendMsg(200, protoMsg)
+	}
+
+	//将周围其他玩家的ID和位置信息发送给当前玩家
+
+	//当前玩家周边全部玩家的信息集合
+	playersProtoMsg := make([]*pb.Player, 0, len(players))
+	for _, player := range players {
+		//定义一个player的protobuf协议消息
+		p := &pb.Player{
+			Pid: player.Pid,
+			P: &pb.Position{
+				X: player.X,
+				Y: player.Y,
+				Z: player.Z,
+				V: player.V,
+			},
+		}
+		playersProtoMsg = append(playersProtoMsg, p)
+	}
+
+	//定义一个周边全部玩家的protobuf协议消息
+	syncPlayersProtoMsg := &pb.SyncPlayers{
+		Ps: playersProtoMsg[:],
+	}
+
+	//将周边全部玩家的protobuf消息作为msgID为202的数据发送给当前客户端
+	p.SendMsg(202, syncPlayersProtoMsg)
+}
