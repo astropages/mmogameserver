@@ -211,3 +211,26 @@ func (p *Player) UpdatePosition(x, y, z, v float32) {
 		player.SendMsg(200, protoMsg)
 	}
 }
+
+//OffLine 玩家下线广播的方法
+func (p *Player) OffLine() {
+	//获取当前玩家周边的全部玩家
+	players := p.GetSurroundingPlayers()
+
+	//定义一个玩家ID的proto协议消息
+	protoMsg := &pb.SyncPid{
+		Pid: p.Pid,
+	}
+
+	//将玩家ID的proto协议消息以msgID为201的数据发送给周边全部玩家
+	for _, player := range players {
+		player.SendMsg(201, protoMsg)
+	}
+
+	//将下线的玩家从世界管理器中移除
+	WorldMgrObj.RemovePlayerByPid(p.Pid)
+
+	//将下线玩家从地图AOIManager中移除
+	WorldMgrObj.AoiMgr.RemoveFromGridByPos(int(p.Pid), p.X, p.Z)
+
+}

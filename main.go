@@ -34,12 +34,23 @@ func OnConnectionAdd(conn tsinterface.IConnection) {
 
 }
 
+//OnConnectionLost 客户端连接断开前触发的hook函数
+func OnConnectionLost(conn tsinterface.IConnection) {
+	//获取当前下线的玩家
+	pid, _ := conn.GetProperty("pid")
+	player := core.WorldMgrObj.GetPlayerByPid(pid.(int32))
+	//调用玩家下线广播的方法
+	player.OffLine()
+}
+
 func main() {
 	//创建一个服务器
 	s := tsnet.NewServer("MMO Game Server")
 
-	//注册hook函数
+	//注册连接建立后的hook函数
 	s.AddOnConnStart(OnConnectionAdd)
+	//注册连接断开前的hook函数
+	s.AddOnConnStop(OnConnectionLost)
 
 	//定义msgID为2的业务路由（世界聊天）
 	s.AddRouter(2, &apis.WorldChat{})

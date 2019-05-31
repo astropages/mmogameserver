@@ -58,7 +58,7 @@ func (wm *WorldManager) RemovePlayerByPid(pid int32) {
 	//先通过pid从世界管理中获取player对象
 	player := wm.Players[pid]
 	//从世界地图中删除
-	wm.AoiMgr.RemoveFromGridByPos(int(pid), player.X, player.Y)
+	wm.AoiMgr.RemoveFromGridByPos(int(pid), player.X, player.Z)
 	//从世界管理器中删除
 	delete(wm.Players, pid)
 	wm.PLock.Unlock()
