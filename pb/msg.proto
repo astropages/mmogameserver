@@ -1,0 +1,32 @@
+syntax = "proto3";      //语法：指定protobuf的版本号
+package pb;             //包名：指定通过protoc编译后的go文件包包名
+
+
+//返回给玩家上线的ID信息
+message SyncPid{
+		int32 Pid=1;
+}
+
+//返回给上线玩家初始的坐标
+message BroadCast{
+	int32 Pid=1;
+	int32 Tp=2; //Tp: 1 世界聊天, 2 坐标, 3 动作, 4 移动之后坐标信息更新
+	oneof Data {
+		string Content=3;
+		Position P=4;
+		int32 ActionData=5;
+	}
+}
+
+//位置信息
+message Position{
+	float X=1;
+	float Y=2;
+	float Z=3;
+	float V=4;
+}
+
+//聊天数据(由client发送给server)
+message Talk{
+	string Content=1;
+}
