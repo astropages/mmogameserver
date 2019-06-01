@@ -9,6 +9,7 @@ import (
 	"math/rand"
 	"mmogameserver/pb"
 	"sync"
+	"time"
 	"tinyserver/tsinterface"
 
 	"github.com/golang/protobuf/proto"
@@ -271,6 +272,7 @@ func (p *Player) OnExchangeAoiGrid(oldGrid, newGrid int) {
 					},
 				},
 			}
+			time.Sleep(200 * time.Millisecond)
 			p.SendMsg(200, anoterOnlineMsg)
 		}
 	}
