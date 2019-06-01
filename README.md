@@ -5,11 +5,11 @@ A demo of MMO game server using tinyserver
 
 Demo Client:
 
-* clientAiRobot.go
+* clientRobot.go
 
 
 
-*clientAiRobot.go*
+*clientRobot.go*
 
 ```go
 /*
@@ -128,8 +128,8 @@ func (t *TCPClient) SendMsg(msgID uint32, data proto.Message) {
 	}
 }
 
-//AiRobotAction 简单的AI动作(聊天或移动)
-func (t *TCPClient) AiRobotAction() {
+//RobotAction 机器人聊天和移动动作的方法
+func (t *TCPClient) RobotAction() {
 	tp := rand.Intn(2)
 	if tp == 0 {
 		//自动聊天
@@ -214,7 +214,7 @@ func (t *TCPClient) DoMsg(msg *Message) {
 			//客户端主动请求动作
 			go func() {
 				for {
-					t.AiRobotAction() //自动完成一个AI动作
+					t.RobotAction() //自动完成一个机器人动作
 					time.Sleep(5 * time.Second)
 				}
 			}()
@@ -259,7 +259,7 @@ func (t *TCPClient) Start() {
 
 func main() {
 
-	//模拟上线2个玩家
+	//模拟上线2个机器人玩家
 	for i := 0; i < 2; i++ {
 		//初始化客户端对象
 		client := NewTCPClient("127.0.0.1", 8999)
