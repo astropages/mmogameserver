@@ -86,3 +86,16 @@ func (wm *WorldManager) GetAllPlayers() []*Player {
 	//返回全部在线玩家
 	return players
 }
+
+//GetPlayersByGrid 获取一个格子中全部玩家的集合
+func (wm *WorldManager) GetPlayersByGrid(gid int) []*Player {
+	//通过gid获取对应格子和总分的全部playerID
+	pids := wm.AoiMgr.GetPidsByGrid(gid)
+
+	//通过pids获取players
+	players := make([]*Player, 0, len(pids))
+	for _, pid := range pids {
+		players = append(players, wm.Players[int32(pid)])
+	}
+	return players
+}
