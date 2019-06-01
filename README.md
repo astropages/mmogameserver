@@ -35,12 +35,13 @@ import (
 
 //TCPClient 客户端类
 type TCPClient struct {
-	conn net.Conn //通信socket
-	Pid  int32    //玩家ID
-	X    float32
-	Y    float32
-	Z    float32
-	V    float32
+	conn   net.Conn //通信socket
+	Pid    int32    //玩家ID
+	X      float32
+	Y      float32
+	Z      float32
+	V      float32
+	online chan bool //上线成功通道
 }
 
 //Message 数据包类
@@ -60,12 +61,13 @@ func NewTCPClient(ip string, port int) *TCPClient {
 	}
 	//请求成功
 	client := &TCPClient{
-		conn: conn,
-		Pid:  0,
-		X:    0,
-		Y:    0,
-		Z:    0,
-		V:    0,
+		conn:   conn,
+		Pid:    0,
+		X:      0,
+		Y:      0,
+		Z:      0,
+		V:      0,
+		online: make(chan bool),
 	}
 	fmt.Println("服务器连接成功")
 	return client
@@ -211,13 +213,9 @@ func (t *TCPClient) DoMsg(msg *Message) {
 			t.V = bdata.GetP().V
 			fmt.Printf("玩家%d上线，位置：%f,%f,%f,%f\n", t.Pid, t.X, t.Y, t.Z, t.V)
 
-			//客户端主动请求动作
-			go func() {
-				for {
-					t.RobotAction() //自动完成一个机器人动作
-					time.Sleep(5 * time.Second)
-				}
-			}()
+			//玩家上线成功，客户端主动请求动作
+			t.online <- true
+
 		} else if bdata.Tp == 1 {
 			//世界聊天广播的消息
 			fmt.Printf("世界聊天 | 玩家%d: %s\n", bdata.Pid, bdata.GetContent())
@@ -255,6 +253,16 @@ func (t *TCPClient) Start() {
 		}
 	}()
 
+	//阻塞
+	select {
+	case <-t.online: //上线成功
+		go func() {
+			for {
+				t.RobotAction() //自动完成一个机器人动作
+				time.Sleep(5 * time.Second)
+			}
+		}()
+	}
 }
 
 func main() {
