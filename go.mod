@@ -2,7 +2,7 @@ module mmogameserver
 
 go 1.12
 
-replace tinyserver => /Users/waaa/Documents/tinyserver
+replace tinyserver => ../tinyserver
 
 require (
 	github.com/golang/protobuf v1.3.2
